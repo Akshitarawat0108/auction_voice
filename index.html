@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎙️ OmniBid – Secure Voice Auction</title>
+  <style>
+  :root {
+    --primary-color: #00f0ff;
+    --secondary-color: #141414;
+    --accent-color: #ff00cc;
+    --text-color: #ffffff;
+    --card-bg: #1a1a1a;
+    --border-radius: 10px;
+  }
+
+  body {
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    background-color: #0d0d0d;
+    color: var(--text-color);
+    margin: 0;
+    padding: 30px 20px;
+    text-align: center;
+  }
+
+  h1, h2 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+
+  .container {
+    display: none;
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--primary-color);
+    margin: auto;
+    max-width: 600px;
+  }
+
+  input, select, button {
+    width: 90%;
+    padding: 14px;
+    margin: 12px 0;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--primary-color);
+    background: var(--secondary-color);
+    color: var(--text-color);
+    font-size: 16px;
+    outline: none;
+  }
+
+  input::placeholder {
+    color: #aaa;
+  }
+
+  select {
+    background-color: var(--secondary-color);
+  }
+
+  button {
+    background-color: var(--primary-color);
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #00d9e8;
+  }
+
+  #responseButtons button {
+    width: auto;
+    padding: 10px 20px;
+    margin: 8px;
+    background: var(--accent-color);
+    color: #000;
+    font-weight: bold;
+    border-radius: 6px;
+    border: none;
+  }
+
+  .highlight {
+    color: var(--accent-color);
+    font-weight: bold;
+  }
+
+  #log, #auction, #responseArea, #otpArea, #analytics, #receipt, #history, #productStats, #productList {
+    margin-top: 25px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+  }
+
+  th, td {
+    border: 1px solid var(--primary-color);
+    padding: 12px;
+    text-align: center;
+  }
+
+  th {
+    background-color: #101010;
+    color: var(--primary-color);
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  li {
+    margin: 6px 0;
+    color: var(--text-color);
+  }
+
+  #voiceBotBtn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 14px 24px;
+    background-color: var(--accent-color);
+    color: #000;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    transition: background-color 0.3s ease;
+  }
+
+  #voiceBotBtn:hover {
+    background-color: #ff33cc;
+  }
+</style>
+
+</head>
+<body>
+
+<h1>🎙️ OmniBid – Secure Voice Auction</h1>
+
+<!-- REGISTER -->
+<div id="registerSection" class="container" style="display: block;">
+
+  <h2>Register</h2>
+  <input type="text" id="regName" placeholder="Full Name" required>
+  <input type="email" id="regEmail" placeholder="Email" required>
+  <input type="password" id="regPass" placeholder="Password" required>
+  <button onclick="registerUser()">Register</button>
+    <button onclick="startVoiceRegister()">🎤 Voice Register</button>
+</div>
+
+<!-- LOGIN -->
+<div id="loginSection" class="container">
+  <!-- Under Register Section -->
+
+
+
+
+  <h2>Login</h2>
+  <input type="email" id="loginEmail" placeholder="Email" required>
+  <input type="password" id="loginPass" placeholder="Password" required>
+  <button onclick="loginUser()">Login</button>
+
+<!-- Under Login Section -->
+<button onclick="startVoiceLogin()">🎤 Voice Login</button>
+
+</div>
+
+<!-- AUCTION SYSTEM -->
+<div id="auctionSection" class="container">
+  <label for="language">🌐 Select Language:</label>
+  <select id="language">
+    <option value="en-IN">English</option>
+    <option value="hi-IN">Hindi</option>
+    <option value="spa-IN">Spanish</option>
+    <option value="ger-IN">German</option>
+    <option value="guj-IN">Gujrati</option>
+    <option value="ma-IN">Marathi</option>
+    <option value="bh-IN">Bhojpuri</option>
+    <option value="fre-IN">French</option>
+
+  </select>
+  <input type="text" id="mobile" placeholder="📱 Enter Mobile Number" maxlength="10">
+  <button onclick="startOTPAuth()">🔐 Start Secure Auction</button>
+  <button onclick="promptFriendBid()">👭 Friend Place Bid (Voice)</button>
+  <button onclick="listAllProducts()">📦 Show All Auctioned Products</button>
+  <a href="webhook.html" id="voiceBotBtn" target="_blank">🧠 Open Voice Command Assistant</a>
+
+
+  <div id="otpArea"></div>
+  <div id="log"></div>
+  <div id="auction"></div>
+  <div id="analytics"></div>
+  <div id="productStats"></div>
+  <div id="receipt"></div>
+  <div id="history"></div>
+  <div id="responseArea"></div>
+  <div id="responseButtons" style="display:none;">
+    <button onclick="handleUserResponse('yes')">✅ Yes</button>
+    <button onclick="handleUserResponse('no')">❌ No</button>
+  </div>
+  <div id="productList"></div>
+  <a href="chatbot.html" target="_blank" style="color:#03dac6; font-weight:bold; font-size:18px;">🤖 Open Auctionary Chatbot</a>
+
+</div>
+
+<script>
+  let users = {};
+  let currentItem = "", maxBid = 0, currentBid = 0, auctionInterval, paused = false;
+  let generatedOTP = "", activeBidders = 1, bidHistory = [], productStats = {};
+
+  function registerUser() {
+    const name = document.getElementById("regName").value.trim();
+    const email = document.getElementById("regEmail").value.trim();
+    const pass = document.getElementById("regPass").value.trim();
+    if (!name || !email || !pass) return alert("Please fill all fields!");
+    users[email] = { name, pass };
+    alert("Registered successfully!");
+    document.getElementById("registerSection").style.display = "none";
+    document.getElementById("loginSection").style.display = "block";
+  }
+
+  function loginUser() {
+    const email = document.getElementById("loginEmail").value.trim();
+    const pass = document.getElementById("loginPass").value.trim();
+    if (!users[email] || users[email].pass !== pass) return alert("Invalid credentials!");
+    alert("Login successful!");
+    document.getElementById("loginSection").style.display = "none";
+    document.getElementById("auctionSection").style.display = "block";
+  }
+
+  function getSelectedLang() {
+    return document.getElementById("language").value;
+  }
+
+  function speak(text) {
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = getSelectedLang();
+    speechSynthesis.speak(msg);
+  }
+
+  function startOTPAuth() {
+    const mobile = document.getElementById("mobile").value.trim();
+    if (!/^\d{10}$/.test(mobile)) {
+      speak("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+    generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+    document.getElementById("otpArea").innerHTML = `📱 OTP sent: <span class='highlight'>${generatedOTP}</span>`;
+    speak("Say the OTP to continue.");
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = getSelectedLang();
+    recognition.start();
+    recognition.onresult = function(event) {
+      const spokenOTP = event.results[0][0].transcript.match(/\d+/);
+      if (spokenOTP && spokenOTP[0] === generatedOTP) {
+        speak("OTP confirmed.");
+        startAuctionProcess();
+      } else {
+        speak("Incorrect OTP.");
+      }
+    };
+  }
+
+  function startAuctionProcess() {
+    askItemName();
+  }
+
+  function askItemName() {
+    speak("Which item do you want to auction?");
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = getSelectedLang();
+    recognition.start();
+    recognition.onresult = function(event) {
+      currentItem = event.results[0][0].transcript.trim();
+      document.getElementById("log").innerHTML = `📦 Item: <span class='highlight'>${currentItem}</span>`;
+      askMaxBid();
+    };
+  }
+
+  function askMaxBid() {
+    speak("What is the maximum bid amount?");
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = getSelectedLang();
+    recognition.start();
+    recognition.onresult = function(event) {
+      const transcript = event.results[0][0].transcript.toLowerCase();
+      const num = transcript.match(/\d+/);
+      if (num && parseInt(num[0]) > 0) {
+        maxBid = parseInt(num[0]);
+        speak(`Max bid set to ₹${maxBid}`);
+        startAuction();
+      } else {
+        speak("Sorry, I could not understand the amount. Please try again.");
+        askMaxBid();
+      }
+    };
+    recognition.onerror = function(e) {
+      speak("There was a problem hearing your voice. Try again.");
+      askMaxBid();
+    };
+  }
+
+  function startAuction() {
+    speak(`Starting auction for ${currentItem}`);
+    currentBid = 0;
+    if (!productStats[currentItem]) productStats[currentItem] = { totalBids: 0, highestBid: 0 };
+    auctionInterval = setInterval(() => {
+      if (!paused) {
+        currentBid += 100;
+        productStats[currentItem].totalBids++;
+        productStats[currentItem].highestBid = Math.max(productStats[currentItem].highestBid, currentBid);
+        document.getElementById("auction").innerHTML = `🔨 ${currentItem} | ₹${currentBid}`;
+        if (currentBid >= maxBid) {
+          clearInterval(auctionInterval);
+          speak(`Final bid ₹${maxBid} reached.`);
+          document.getElementById("auction").innerHTML += `<br>✅ SOLD for ₹${maxBid}`;
+          bidHistory.push({ item: currentItem, amount: maxBid });
+          updateHistory();
+          updateStats();
+          speakReceipt();
+        }
+      }
+    }, 1000);
+  }
+
+  function promptFriendBid() {
+    speak("Friend, please say your bid amount now.");
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = getSelectedLang();
+    recognition.start();
+    recognition.onresult = function(event) {
+      const transcript = event.results[0][0].transcript.toLowerCase();
+      const bidMatch = transcript.match(/(\d+)/);
+      if (bidMatch) {
+        const bidAmount = parseInt(bidMatch[1]);
+        activeBidders++;
+        startFriendBid(bidAmount);
+      } else {
+        speak("Could not understand the bid amount. Please try again.");
+        promptFriendBid();
+      }
+    };
+    recognition.onerror = function(e) {
+      speak("Error hearing bid. Please try again.");
+      promptFriendBid();
+    };
+  }
+
+  function startFriendBid(bidAmount) {
+    if (bidAmount < maxBid) {
+      clearInterval(auctionInterval);
+      paused = true;
+      currentBid = bidAmount;
+      document.getElementById("auction").innerHTML = `👭 Friend wants to buy ${currentItem} for ₹${bidAmount}`;
+      document.getElementById("responseButtons").style.display = 'block';
+      speak("Do others want to bid higher? Say yes or no.");
+    } else {
+      speak("Bid too high or invalid.");
+    }
+  }
+
+  function handleUserResponse(response) {
+    document.getElementById("responseButtons").style.display = 'none';
+    if (response === 'yes') {
+      paused = false;
+      startAuction();
+    } else {
+      speak(`Auction closed at ₹${currentBid}`);
+      bidHistory.push({ item: currentItem, amount: currentBid });
+      updateHistory();
+      updateStats();
+      speakReceipt();
+    }
+  }
+
+  function updateHistory() {
+    let list = '<h3>📚 History</h3><ul>';
+    bidHistory.forEach(e => list += `<li>${e.item}: ₹${e.amount}</li>`);
+    list += '</ul>';
+    document.getElementById("history").innerHTML = list;
+  }
+
+  function updateStats() {
+    let stats = '<h3>📊 Stats</h3><ul>';
+    for (let i in productStats)
+      stats += `<li>${i}: Bids - ${productStats[i].totalBids}, Highest - ₹${productStats[i].highestBid}</li>`;
+    stats += '</ul>';
+    document.getElementById("productStats").innerHTML = stats;
+  }
+
+  function speakReceipt() {
+    const mobile = document.getElementById("mobile").value;
+    const msg = `Item ${currentItem} sold for ₹${currentBid}. Receipt sent to ${mobile}.`;
+    speak(msg);
+    document.getElementById("receipt").innerHTML = msg;
+  }
+
+  function listAllProducts() {
+    if (bidHistory.length === 0) {
+      document.getElementById("productList").innerHTML = "❌ No auctions completed yet.";
+      return;
+    }
+    let html = "<h3>📋 All Auctioned Products</h3><table>";
+    html += "<tr><th>Item</th><th>Final Bid</th><th>Bidder</th></tr>";
+    bidHistory.forEach(entry => {
+      html += `<tr>
+        <td>${entry.item}</td>
+        <td>₹${entry.amount}</td>
+        <td>${document.getElementById("mobile").value}</td>
+      </tr>`;
+    });
+    html += "</table>";
+    document.getElementById("productList").innerHTML = html;
+  }
+  function startVoiceRegister() {
+  let name, email, password;
+
+  speak("Say your full name");
+  listenOnce().then(n => {
+    name = n.trim();
+    speak("Say your email address");
+    return listenOnce();
+  }).then(e => {
+    email = e.trim().replace(/\s+/g, '').toLowerCase();  // voice email usually has spaces
+    speak("Say your password");
+    return listenOnce();
+  }).then(p => {
+    password = p.trim().replace(/\s+/g, '');
+    speak(`You said name ${name}, email ${email}. Confirm to register. Say yes to continue.`);
+    return listenOnce();
+  }).then(confirm => {
+    if (confirm.toLowerCase().includes('yes')) {
+      users[email] = { name, pass: password };
+      alert("Registered successfully!");
+      document.getElementById("registerSection").style.display = "none";
+      document.getElementById("loginSection").style.display = "block";
+    } else {
+      speak("Registration canceled.");
+    }
+  }).catch(err => speak("Error during voice registration. Try again."));
+}
+
+function startVoiceLogin() {
+  let email, password;
+
+  speak("Say your email address");
+  listenOnce().then(e => {
+    email = e.trim().replace(/\s+/g, '').toLowerCase();
+    speak("Say your password");
+    return listenOnce();
+  }).then(p => {
+    password = p.trim().replace(/\s+/g, '');
+    speak("Confirm to login. Say yes to continue.");
+    return listenOnce();
+  }).then(confirm => {
+    if (confirm.toLowerCase().includes('yes')) {
+      if (!users[email] || users[email].pass !== password) {
+        speak("Login failed. Invalid credentials.");
+      } else {
+        speak("Login successful. Welcome.");
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("auctionSection").style.display = "block";
+      }
+    } else {
+      speak("Login canceled.");
+    }
+  }).catch(err => speak("Error during voice login. Try again."));
+}
+
+function listenOnce() {
+  return new Promise((resolve, reject) => {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = getSelectedLang();
+    recognition.start();
+
+    recognition.onresult = event => resolve(event.results[0][0].transcript);
+    recognition.onerror = err => reject(err);
+  });
+}
+
+</script>
+
+</body>
+</html>
