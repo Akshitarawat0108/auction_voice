@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Auctionary Chatbot</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #121212;
+    color: #e0e0e0;
+    padding: 40px;
+    text-align: center;
+  }
+
+  h2 {
+    color: #bb86fc;
+    font-size: 2rem;
+    text-shadow: 0 0 8px #bb86fc;
+    margin-bottom: 30px;
+  }
+
+  button {
+    background: linear-gradient(145deg, #3700b3, #03dac6);
+    color: white;
+    padding: 15px 25px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 10px;
+    box-shadow: 0 0 12px #03dac6;
+    transition: 0.3s ease;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+  }
+
+  #response {
+    margin-top: 30px;
+    padding: 25px;
+    width: 85%;
+    max-width: 700px;
+    background-color: #1f1f1f;
+    border-radius: 12px;
+    box-shadow: 0 0 16px rgba(187, 134, 252, 0.4);
+    white-space: pre-line;
+    text-align: left;
+    font-size: 16px;
+    color: #ffffff;
+    line-height: 1.6;
+  }
+</style>
+
+</head>
+<body>
+  <h2>🎙️ Auctionary Chatbot</h2>
+  <button onclick="startVoice()">🎤 Speak</button>
+  <button onclick="resetAuction()">🔄 Reset Auction</button>
+  <button onclick="speakLeaderboard()">🏆 Speak Leaderboard</button>
+  <div id="response"></div>
+
+  <script>
+    function startVoice() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-IN';
+      recognition.start();
+
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById("response").innerText = "🗣️ You said: " + transcript;
+
+        fetch('/webhook', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: transcript })
+        })
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("response").innerText += "\n\n🤖 " + data.reply;
+          const utterance = new SpeechSynthesisUtterance(data.reply);
+          speechSynthesis.speak(utterance);
+        });
+      };
+    }
+
+    function resetAuction() {
+      fetch('/webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: 'reset auction' })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("response").innerText = "🤖 " + data.reply;
+        const utterance = new SpeechSynthesisUtterance(data.reply);
+        speechSynthesis.speak(utterance);
+      });
+    }
+
+    function speakLeaderboard() {
+      fetch('/webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: 'leaderboard' })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("response").innerText = "🤖 " + data.reply;
+        const utterance = new SpeechSynthesisUtterance(data.reply);
+        speechSynthesis.speak(utterance);
+      });
+    }
+  </script>
+</body>
+</html>
