@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Auctionary Assistant</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f2f2f2;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    .chat-box {
+      background: #fff;
+      width: 400px;
+      height: 400px;
+      overflow-y: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .message {
+      margin: 10px 0;
+      padding: 10px 15px;
+      border-radius: 10px;
+      max-width: 80%;
+      clear: both;
+    }
+
+    .user {
+      background-color: #d1e7ff;
+      align-self: flex-end;
+      float: right;
+    }
+
+    .bot {
+      background-color: #e2e2e2;
+      align-self: flex-start;
+      float: left;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 14px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #sendBtn {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    #micButton {
+      background: #fff;
+      border: 1px solid #ccc;
+    }
+
+    #micButton.active {
+      color: red;
+      border-color: red;
+    }
+    #voiceBotBtn {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background-color: #ff00cc;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  box-shadow: 0 0 10px #ff00cc;
+  z-index: 9999;
+  transition: background 0.3s ease;
+}
+
+#voiceBotBtn:hover {
+  background-color: #e600b8;
+}
+
+  </style>
+</head>
+<body>
+  <a href="webhook.html" id="voiceBotBtn">🧠 Voice Chatbot</a>
+
+  <h2>🧠 Auctionary Assistant</h2>
+
+  <div class="chat-box" id="chatBox"></div>
+
+  <div class="input-area">
+    <input type="text" id="commandInput" placeholder="Type or speak your command" />
+    <button id="sendBtn" onclick="sendCommand()">Send</button>
+    <button id="micButton" onclick="toggleMic()">🎙️</button>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById("chatBox");
+
+    function appendMessage(text, type) {
+      const msg = document.createElement("div");
+      msg.classList.add("message", type);
+      msg.innerText = text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendCommand() {
+      const input = document.getElementById("commandInput");
+      const command = input.value.trim();
+      if (!command) return;
+
+      appendMessage(command, "user");
+      input.value = "";
+
+      const response = await fetch("/webhook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command: command })
+      });
+
+      const data = await response.json();
+      appendMessage(data.response, "bot");
+    }
+
+    // 🎙️ Voice Input
+    let recognition;
+    function toggleMic() {
+      const micButton = document.getElementById("micButton");
+
+      if (!recognition) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = "en-IN";
+
+        recognition.onstart = () => {
+          micButton.classList.add("active");
+          micButton.innerText = "🔴";
+        };
+
+        recognition.onend = () => {
+          micButton.classList.remove("active");
+          micButton.innerText = "🎙️";
+        };
+
+        recognition.onresult = (event) => {
+          const text = event.results[0][0].transcript;
+          document.getElementById("commandInput").value = text;
+          sendCommand();
+        };
+      }
+
+      recognition.start();
+    }
+  </script>
+</body>
+</html>
