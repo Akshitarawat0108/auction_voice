@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎹 OmniBid – Secure Voice Auction</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d0d0d;
+      color: #fce4ff;
+      padding: 30px;
+      text-align: center;
+    }
+
+    h1, h2 {
+      color: #ff00cc;
+      text-shadow: 0 0 10px #ff00cc, 0 0 20px #9900ff;
+    }
+
+    .container {
+      display: none;
+      background: #1a001f;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(255, 0, 204, 0.3), 0 0 30px rgba(153, 0, 255, 0.2);
+      margin: auto;
+      max-width: 500px;
+    }
+
+    input, select, button {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ff00cc;
+      background: #0d0d0d;
+      color: #ffe6f7;
+      font-size: 16px;
+    }
+
+    input::placeholder {
+      color: #b366cc;
+    }
+
+    select {
+      background-color: #1a001f;
+    }
+
+    button {
+      background-color: #ff00cc;
+      color: #0d0d0d;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 10px #ff00cc, 0 0 20px #9900ff;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #e600b8;
+      box-shadow: 0 0 15px #ff33cc, 0 0 25px #cc33ff;
+    }
+
+    #responseButtons button {
+      width: auto;
+      padding: 8px 16px;
+      margin: 5px;
+      background: #ff00cc;
+      color: #0d0d0d;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      box-shadow: 0 0 10px #ff00cc;
+    }
+
+    .highlight {
+      color: #ff00cc;
+      font-weight: bold;
+      text-shadow: 0 0 5px #ff66cc;
+    }
+
+    #log, #auction, #responseArea, #otpArea, #analytics, #receipt, #history, #productStats, #productList {
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      color: #ffe6ff;
+      background-color: #1a001f;
+    }
+
+    table, th, td {
+      border: 1px solid #ff00cc;
+    }
+
+    th, td {
+      padding: 10px;
+    }
+
+    th {
+      background-color: #330033;
+      color: #ffccff;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      margin: 5px 0;
+      color: #ffccff;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎹 OmniBid – Secure Voice Auction</h1>
+
+<p style="font-size: 18px; color: #cccccc">Say "start auction" or "list products" or "place bid" after logging in.</p>
+
+<!-- Voice agent integration using OmniDimension -->
+<script>
+async function omniVoiceAgent() {
+  const commands = {
+    "start auction": () => speak("Starting a new auction. Say the product name."),
+    "list products": () => speak("Listing all available products..."),
+    "place bid": () => speak("Please say your bid amount."),
+    "exit": () => speak("Exiting voice agent. Thank you for using OmniBid!")
+  };
+
+  speak("Welcome to OmniBid Voice Auction. Say a command like start auction, place bid, or list products.");
+
+  while (true) {
+    const input = await listenOnce();
+    const cmd = Object.keys(commands).find(c => input.toLowerCase().includes(c));
+    if (cmd) {
+      commands[cmd]();
+      if (cmd === "exit") break;
+    } else {
+      speak("Sorry, command not recognized. Please try again.");
+    }
+  }
+}
+
+function speak(text) {
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang = "en-IN";
+  speechSynthesis.speak(msg);
+}
+
+function listenOnce() {
+  return new Promise((resolve, reject) => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-IN";
+    recognition.start();
+    recognition.onresult = e => resolve(e.results[0][0].transcript);
+    recognition.onerror = e => reject(e);
+  });
+}
+
+window.onload = omniVoiceAgent;
+</script>
+
+</body>
+</html>
